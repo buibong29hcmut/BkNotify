@@ -1,0 +1,14 @@
+﻿@page "/"
+
+@using System.ComponentModel.DataAnnotations
+
+<div>
+        <label for="fname">Ws Token</label>
+        <input type="text" id="fname" name="firstname" placeholder="Your Token.." @bind-value="@WsToken">
+
+        <label for="lname">Email</label>
+        <input type="text" id="lname" name="lastname" placeholder="Your Email.." @bind-value="@Email">
+
+        <button   @onclick="@Submit">Submit</button>
+   
+</div>
