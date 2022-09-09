@@ -1,4 +1,5 @@
 ﻿using BkMail.Models;
+using MailKit;
 using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -27,12 +28,11 @@ namespace BkMail.Services
             var builder = new BodyBuilder();
             builder.HtmlBody = mail.BodyHtml;
             email.Body = builder.ToMessageBody();
-            using var smtp = new MailKit.Net.Smtp.SmtpClient();
+            using var smtp = new MailKit.Net.Smtp.SmtpClient(new ProtocolLogger("smtp.log"));
 
-          
-                smtp.AuthenticationMechanisms.Remove("XOAUTH2");
+            smtp.ServerCertificateValidationCallback = (s, c, h, e) => true;
 
-                smtp.Connect(mailSettings.Host, mailSettings.Port, SecureSocketOptions.StartTls);
+            smtp.Connect(mailSettings.Host, mailSettings.Port, SecureSocketOptions.StartTls);
                 smtp.Authenticate(mailSettings.Mail, mailSettings.Password);
                 await smtp.SendAsync(email);
             

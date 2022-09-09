@@ -1,4 +1,5 @@
 ﻿
+using BkMail.Contracts;
 using BkMail.Models;
 using BkMail.Services;
 using Microsoft.Extensions.Configuration;
@@ -32,6 +33,7 @@ namespace BkMail.Test
             services.Configure<MailSettings>(config.GetSection("MailSettings"));
             services.AddScoped<IMailService, MailService>();
             services.AddScoped<IMessageBkApi, MessageBkApi>();
+            services.AddScoped<IEventBkApi, EventBkApi>();
 
             return services;
         }

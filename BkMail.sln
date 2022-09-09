@@ -5,7 +5,7 @@ VisualStudioVersion = 17.3.32721.290
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BkMail", "BkMail\BkMail.csproj", "{7448056D-CFE8-4828-B9B6-71A806B1EB5C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BkMail.Test", "BkMail.Test\BkMail.Test.csproj", "{2A3FADE0-67B4-4E5C-A26C-1E3C2D7F1CFA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BkMail.Test", "BkMail.Test\BkMail.Test.csproj", "{2A3FADE0-67B4-4E5C-A26C-1E3C2D7F1CFA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

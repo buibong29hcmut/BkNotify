@@ -1,7 +1,7 @@
 ﻿@page "/"
-
+@using Blazorise.Components
 @using System.ComponentModel.DataAnnotations
-
+@using Blazorise.Snackbar
 <div>
         <label for="fname">Ws Token</label>
         <input type="text" id="fname" name="firstname" placeholder="Your Token.." @bind-value="@WsToken">
@@ -10,5 +10,47 @@
         <input type="text" id="lname" name="lastname" placeholder="Your Email.." @bind-value="@Email">
 
         <button   @onclick="@Submit">Submit</button>
-   
+    <Snackbar @ref="validateTokenAndEmail" Color="SnackbarColor.Warning">
+        <SnackbarBody>
+            Token và Email không được để trống
+            <SnackbarAction Clicked="@(()=>validateTokenAndEmail.Hide())">CLOSE</SnackbarAction>
+        </SnackbarBody>
+    </Snackbar>
+    <Snackbar @ref="snackbarValidateEmail" Color="SnackbarColor.Warning">
+        <SnackbarBody>
+            Email không được để trống
+            <SnackbarAction Clicked="@(()=>snackbarValidateEmail.Hide())">CLOSE</SnackbarAction>
+        </SnackbarBody>
+    </Snackbar>
+    <Snackbar @ref="snackbarValidateToken" Color="SnackbarColor.Warning">
+        <SnackbarBody>
+            Token không được để trống
+            <SnackbarAction Clicked="@(()=>snackbarValidateEmail.Hide())">CLOSE</SnackbarAction>
+        </SnackbarBody>
+    </Snackbar>
+    <Snackbar @ref="validateWsTokenValid" Color="SnackbarColor.Warning">
+        <SnackbarBody>
+            Token không hợp lệ
+            <SnackbarAction Clicked="@(()=>snackbarValidateEmail.Hide())">CLOSE</SnackbarAction>
+        </SnackbarBody>
+    </Snackbar>
+    <Snackbar @ref="emailValid" Color="SnackbarColor.Warning">
+        <SnackbarBody>
+            Email không hợp lệ
+            <SnackbarAction Clicked="@(()=>snackbarValidateEmail.Hide())">CLOSE</SnackbarAction>
+        </SnackbarBody>
+    </Snackbar>
+    <Snackbar @ref="success" Color="SnackbarColor.Success">
+        <SnackbarBody>
+            Đã thêm thành công
+            <SnackbarAction Clicked="@(()=>snackbarValidateEmail.Hide())">CLOSE</SnackbarAction>
+        </SnackbarBody>
+    </Snackbar>
+    <Snackbar @ref="validateExistWsTokenAndEmail" Color="SnackbarColor.Success">
+        <SnackbarBody>
+            Email và Token đã tồn tại
+            <SnackbarAction Clicked="@(()=>validateExistWsTokenAndEmail.Hide())">CLOSE</SnackbarAction>
+        </SnackbarBody>
+    </Snackbar>
 </div>
+

@@ -1,16 +1,22 @@
 ﻿using BkMail.Context;
 using BkMail.Contracts;
 using BkMail.Entities;
+using Blazorise;
+using Blazorise.Snackbar;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
-using MudBlazor;
 
 namespace BkMail.Pages
 {
     public partial class Index
     {
-        [Inject]   
-        private ISnackbar SackBar { get; set; }
+        private Snackbar validateTokenAndEmail;
+        private Snackbar snackbarValidateEmail;
+        private Snackbar snackbarValidateToken;
+        private Snackbar validateWsTokenValid;
+        private Snackbar emailValid;
+        private Snackbar validateExistWsTokenAndEmail;
+        private Snackbar success;
         [Inject]
         private IDbContextFactory<BkDbContext> _Factory { get; set; }
         [Inject]
@@ -20,37 +26,63 @@ namespace BkMail.Pages
         private string Email { get; set; }
         private string WsToken { get; set; }
         
-        public void ShowMessage(string message, Severity severity)
+        public void ShowMessage( Snackbar snackbar)
         {
-            SackBar.Add(message,severity);
+            snackbar.Show();
         }
         public async Task Submit()
         {
             if(string.IsNullOrEmpty(Email)&& string.IsNullOrEmpty(WsToken))
             {
-                ShowMessage("Email và WsToken không được để trống", Severity.Normal);
+                ShowMessage(validateTokenAndEmail);
                 return;
             }
             if (string.IsNullOrEmpty(Email))
             {
-                ShowMessage("Email  không được để trống", Severity.Warning);
+                ShowMessage(snackbarValidateEmail);
+
                 return;
             }
             if (string.IsNullOrEmpty(WsToken))
             {
-                ShowMessage(" WsToken không được để trống", Severity.Warning);
+                ShowMessage(snackbarValidateToken);
+                return;
+            }
+            var trimmedEmail = Email.Trim();
+
+            if (trimmedEmail.EndsWith("."))
+            {
+                ShowMessage(validateWsTokenValid);
+
+            }
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(Email);
+            }
+            catch
+            {
+                ShowMessage(validateWsTokenValid);
                 return;
             }
             bool check = await checkInfoApi.Check(WsToken);
             if (!check)
             {
-                ShowMessage(" WsToken không đúng", Severity.Warning);
+                ShowMessage(validateWsTokenValid);
+                return;
 
             }
-            using(var db= _Factory.CreateDbContext())
+         
+            using (var db = _Factory.CreateDbContext())
             {
+                if(db.StudentDatas.Any(p=>p.WsToken==WsToken&& p.Email==Email))
+                {
+                    ShowMessage(validateExistWsTokenAndEmail);
+                    return;
+                } 
                 await db.AddAsync(new StudentData(WsToken, Email));
                 await db.SaveChangesAsync();
+                ShowMessage(success);
+
                 _logger.LogInformation("Add user");
             }
         }
