@@ -30,14 +30,12 @@ namespace BkMail.Services
                 try
                 {
                     var userGuid = Convert.ToInt32(Convert.ToString(data["preferences"]["userid"]));
-                    if (userGuid!=null)
                         return true;
                 }
                 catch
                 {
                     return false;
                 }
-                return false;
             }
 
         }

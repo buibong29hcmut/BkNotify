@@ -6,6 +6,7 @@ using BkMail;
 using Microsoft.EntityFrameworkCore;
 using System;
 using BkMail.Models;
+using BkMail.Contracts;
 
 public class BkWorkerSendEventMessage:BackgroundService
 {
@@ -21,53 +22,61 @@ public class BkWorkerSendEventMessage:BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            await DoSendMessageUser();
+            await DoSendEventUser();
 
-            await Task.Delay(300, stoppingToken);
+            await Task.Delay(10000, stoppingToken);
         }
 
     }
-    private async Task DoSendMessageUser()
+    private async Task DoSendEventUser()
     {
+     
         using (var scope = _serviceProvider.CreateScope())
         {
             var _dbFactory = scope.ServiceProvider.GetService<IDbContextFactory<BkDbContext>>();
             BkMail.Services.IMailService _mailService = scope.ServiceProvider.GetService<BkMail.Services.IMailService>();
-            IMessageBkApi _messageBkApi = scope.ServiceProvider.GetService<IMessageBkApi>();
-            using (var db = _dbFactory.CreateDbContext())
+            
+            IEventBkApi _eventApi = scope.ServiceProvider.GetService<IEventBkApi>();
+            using(var db= _dbFactory.CreateDbContext())
             {
-                var allUser = db.StudentDatas.ToList();
-                foreach (var user in allUser)
+                var allUser =await db.StudentDatas.ToListAsync();
+                foreach(var user in allUser)
                 {
                     try
                     {
-                        var listMessageUnread = await _messageBkApi.GetAllMessageUnreadByToken(user.WsToken);
-                        foreach (var message in listMessageUnread.messages)
+                        var messageEvent = await _eventApi.GetAllEventsBeforeExpires(user.WsToken,2);
+                        foreach (var eventItem in messageEvent)
                         {
-                            if (db.MailSents.Any(p => p.MailId == message.id))
-                                continue;
-                            var mail = new MailMessage()
+                            if (db.EventDatas.Any(p => p.WsToken == user.WsToken && p.EventId == eventItem.Id))
                             {
-                                BodyHtml = message.fullmessagehtml,
+                                continue;
+                            }
+                            MailMessage mail = new MailMessage()
+                            {
+                                Subject = eventItem.Name,
+                                BodyHtml ="<br>"+ eventItem.Name + "/<br>" +"<br>"+ eventItem.Descrption + "</br>" +"<br>"+ eventItem.EndDay + "</br>" +"<br>"+"Link bài tập"+eventItem.LinkAssignMent+"</br>",
                                 ToUser = user.Email,
-                                Subject = "New message từ" + " " + message.userfromfullname + "-" + message.subject + "-" + "Lúc " + ConvertDateTimeUnixToNormalDatetime.UnixTimeStampToDateTime(message.timecreated).ToString(),
+
+
                             };
                             await _mailService.SendMailAsync(mail);
-                            await db.AddAsync(new MailSent()
+                            await db.EventDatas.AddAsync(new EventData()
                             {
-                                MailId = message.id,
+                                WsToken = user.WsToken,
+                                EventId = eventItem.Id,
                             });
-
                             await db.SaveChangesAsync();
+
                         }
                     }
-                    catch (Exception ex)
+                    catch(Exception ex)
                     {
-                        _logger.LogError(ex.Message);
+                        _logger.LogWarning(ex.Message);
                         continue;
                     }
                 }
             }
+ 
         }
     }
 }

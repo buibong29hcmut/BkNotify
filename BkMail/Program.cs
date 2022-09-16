@@ -37,8 +37,12 @@ builder.Services.AddOptions();
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.AddScoped<IMailService, MailService>();
 builder.Services.AddScoped<IMessageBkApi, MessageBkApi>();
+builder.Services.AddScoped<IEventBkApi, EventBkApi>();
+
 builder.Services.AddScoped<ICheckInfoApi, CheckInfoApi>();
 builder.Services.AddHostedService<BkWorkerSendMessage>();
+builder.Services.AddHostedService<BkWorkerSendEventMessage>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
